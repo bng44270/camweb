@@ -1,0 +1,79 @@
+<html>
+<head>
+<title>Camera Web Viewer</title>
+</head>
+<body>
+  <select id="camera">
+  <option value="NONE">Select Camera</option>
+  {% for thiscam in cams %}
+  <option value="{{thiscam}}">{{thiscam}}</option>
+  {% endfor %}
+  </select><br/>
+  <label for="activecam">Active Camera:</label><input type="text" id="activecam" value="None" disabled />
+  <div id="imagedisplay" style="display:none;">
+    <img id="camimg" /><br/>
+    <button id="refreshimage">Refresh</button><br/>
+    <input type="checkbox" id="autorefresh" /><label for="autorefresh">Auto refresh</label><br/>
+    <div id="delaydisp" style="display:none;">
+      <label for="refreshdelay">Delay (s)</label><input type="text" id="refreshdelay" />
+    </div>
+  </div>
+  <br/><br/>
+  <span style="font-style: italic;">Powered by <a href="https://gist.github.com/bng44270/3a98655bab6aa8939add783fcf437369" target="_blank">pywebcam</a></span>
+
+  <script type="text/javascript">
+    document.body.onload = function() {
+      document.getElementById('activecam').value = 'None';
+      document.getElementById('autorefresh').checked = false;
+      document.getElementById('refreshdelay').value = '1';
+
+      function takePicture() {
+        var camera = document.getElementById('activecam').value;
+        var timestamp = new Date().getTime(); 
+        document.getElementById('camimg').src='/' + camera + '.jpg?' + timestamp.toString();
+      }
+
+      function reloadImage() {
+        var refreshbutton = document.getElementById('refreshimage');
+        var isauto = document.getElementById('autorefresh').checked;
+	var delaydisp = document.getElementById('delaydisp');
+        var delayStr = document.getElementById('refreshdelay');
+
+	var delay = parseFloat(delayStr.value) * 1000;
+
+        if (isauto) {
+	  if (delaydisp.style.display == 'none') delaydisp.style.display = 'block';
+	  if (!refreshbutton.disabled) refreshbutton.disabled = true;
+	  if (isNaN(delay)) {
+	    delay = 1;
+	    delayStr.value = '1';
+	  }
+          takePicture();
+          setTimeout(reloadImage,delay);
+        }
+	else {
+	  refreshbutton.disabled = false;
+	  delaydisp.style.display = 'none';
+	}
+      }
+
+      document.getElementById('camera').onchange = function() {
+        var selectbox = document.getElementById('camera');
+
+	var selcam = selectbox.options[selectbox.selectedIndex].value;
+
+	if (selcam != 'NONE') {
+	  document.getElementById('activecam').value = selcam;
+	  document.getElementById('imagedisplay').style.display = 'block';
+	  takePicture();
+	  selectbox.value = 'NONE';
+	}
+      };
+
+      document.getElementById('refreshimage').onclick = takePicture;
+ 
+      document.getElementById('autorefresh').onclick = reloadImage;
+    };
+  </script>
+</body>
+</html>
