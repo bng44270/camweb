@@ -3,15 +3,7 @@ import os
 from re import match as regex_match
 from flask import Flask, render_template, send_file, request, make_response
 
-class CamWeb(Flask):
-  def __del__(self):
-    super().__del__()
-    camfiles = [a for a in os.listdir('/tmp') if regex_match(r'^pycam-',a)]
-
-    for thisfile in camfiles:
-      os.remove('/tmp/' + thisfile)
-
-app = CamWeb(__name__)
+app = Flask(__name__)
 
 cam = PyWebCam()
 
